@@ -1,12 +1,10 @@
 package com.example.apktest
 
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -19,23 +17,18 @@ private val ns: String? = null
 class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
-        // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-
-        val openRawResource = appContext.resources.openRawResource(R.raw.entries)
-
-        parse(openRawResource)
-
-        assertEquals("com.example.apktest", appContext.packageName)
+        val rawXmlResource = appContext.resources.openRawResource(R.raw.entries)
+        val entries = parse(rawXmlResource)
+        assertEquals(20284, entries.size)
     }
-
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(inputStream: InputStream): List<*> {
-        inputStream.use { inputStream ->
+        inputStream.use { stream ->
             val parser: XmlPullParser = XmlPullParserFactory.newInstance().newPullParser()
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-            parser.setInput(inputStream, null)
+            parser.setInput(stream, null)
             parser.nextTag()
             return readFeed(parser)
         }
@@ -60,34 +53,50 @@ class ExampleInstrumentedTest {
         return entries
     }
 
-    data class Entry(val number: String?, val name: String?, val type: String?, val percent: String?)
+    data class Entry(var number: String) {
+        var name: String = ""
+        var name2: String = ""
+        var price: String = ""
+        var volume: String = ""
+        var litrePrice: String = ""
+        var percent: String = ""
+        var productGroup: String = ""
+        var type: String = ""
+    }
 
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
     @Throws(XmlPullParserException::class, IOException::class)
     private fun readEntry(parser: XmlPullParser): Entry {
         parser.require(XmlPullParser.START_TAG, ns, "artikel")
-        var number: String? = null
-        var name: String? = null
-        var type: String? = null
-        var percent: String? = null
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.eventType != XmlPullParser.START_TAG) {
-                continue
-            }
-            when (parser.name) {
-                "nr" -> number = readName(parser, parser.name)
-                "Namn" -> name = readName(parser, parser.name)
-                "Typ" -> type = readName(parser, parser.name)
-                "Alkoholhalt" -> percent = readName(parser, parser.name)
-                else -> skip(parser)
+        val entry = Entry("-1").apply {
+            while (parser.next() != XmlPullParser.END_TAG) {
+                if (parser.eventType != XmlPullParser.START_TAG) {
+                    continue
+                }
+                parseIfTagIsValid(parser)
             }
         }
-        return Entry(number, name, type, percent)
+        return entry
+    }
+
+    private fun Entry.parseIfTagIsValid(parser: XmlPullParser) {
+        when (parser.name) {
+            "nr" -> this.number = read(parser, parser.name)
+            "Namn" -> this.name = read(parser, parser.name)
+            "Namn2" -> this.name2 = read(parser, parser.name)
+            "Prisinklmoms" -> this.price = read(parser, parser.name)
+            "Volymiml" -> this.volume = read(parser, parser.name)
+            "PrisPerLiter" -> this.litrePrice = read(parser, parser.name)
+            "Alkoholhalt" -> this.percent = read(parser, parser.name)
+            "Varugrupp" -> this.productGroup = read(parser, parser.name)
+            "Typ" -> this.type = read(parser, parser.name)
+            else -> skip(parser)
+        }
     }
 
     @Throws(IOException::class, XmlPullParserException::class)
-    private fun readName(parser: XmlPullParser, tag: String): String {
+    private fun read(parser: XmlPullParser, tag: String): String {
         parser.require(XmlPullParser.START_TAG, ns, tag)
         val title = readText(parser)
         parser.require(XmlPullParser.END_TAG, ns, tag)
