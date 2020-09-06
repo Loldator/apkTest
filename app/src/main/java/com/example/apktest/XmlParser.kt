@@ -1,10 +1,5 @@
 package com.example.apktest
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -13,15 +8,7 @@ import java.io.InputStream
 
 private val ns: String? = null
 
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-    @Test
-    fun useAppContext() {
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val rawXmlResource = appContext.resources.openRawResource(R.raw.entries)
-        val entries = parse(rawXmlResource)
-        assertEquals(20284, entries.size)
-    }
+interface XmlParser {
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(inputStream: InputStream): List<*> {
