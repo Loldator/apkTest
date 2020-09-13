@@ -1,5 +1,6 @@
-package com.example.apktest
+package com.example.apktest.xml
 
+import com.example.apktest.xml.product.Product
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -11,7 +12,7 @@ private val ns: String? = null
 interface XmlParser {
 
     @Throws(XmlPullParserException::class, IOException::class)
-    fun parse(inputStream: InputStream): List<*> {
+    fun parse(inputStream: InputStream): List<Product> {
         inputStream.use { stream ->
             val parser: XmlPullParser = XmlPullParserFactory.newInstance().newPullParser()
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
@@ -22,8 +23,8 @@ interface XmlParser {
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readFeed(parser: XmlPullParser): List<Entry> {
-        val entries = mutableListOf<Entry>()
+    private fun readFeed(parser: XmlPullParser): List<Product> {
+        val entries = mutableListOf<Product>()
 
         parser.require(XmlPullParser.START_TAG, ns, "artiklar")
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -40,23 +41,12 @@ interface XmlParser {
         return entries
     }
 
-    data class Entry(var number: String) {
-        var name: String = ""
-        var name2: String = ""
-        var price: String = ""
-        var volume: String = ""
-        var litrePrice: String = ""
-        var percent: String = ""
-        var productGroup: String = ""
-        var type: String = ""
-    }
-
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readEntry(parser: XmlPullParser): Entry {
+    private fun readEntry(parser: XmlPullParser): Product {
         parser.require(XmlPullParser.START_TAG, ns, "artikel")
-        val entry = Entry("-1").apply {
+        val entry = Product("-1").apply {
             while (parser.next() != XmlPullParser.END_TAG) {
                 if (parser.eventType != XmlPullParser.START_TAG) {
                     continue
@@ -67,7 +57,7 @@ interface XmlParser {
         return entry
     }
 
-    private fun Entry.parseIfTagIsValid(parser: XmlPullParser) {
+    private fun Product.parseIfTagIsValid(parser: XmlPullParser) {
         when (parser.name) {
             "nr" -> this.number = read(parser, parser.name)
             "Namn" -> this.name = read(parser, parser.name)
