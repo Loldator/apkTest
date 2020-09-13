@@ -1,5 +1,6 @@
 package com.example.apktest.xml.product
 
+import com.example.apktest.db.Product
 import com.example.apktest.xml.XmlParser
 import okhttp3.ResponseBody
 import retrofit2.Converter

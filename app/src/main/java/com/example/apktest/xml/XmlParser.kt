@@ -1,6 +1,6 @@
 package com.example.apktest.xml
 
-import com.example.apktest.xml.product.Product
+import com.example.apktest.db.Product
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
