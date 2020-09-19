@@ -1,47 +1,23 @@
 package com.example.apktest
 
 import android.os.Bundle
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import com.example.apktest.db.Product
-import com.example.apktest.http.ProductService
-import com.example.apktest.http.ServiceBuilder
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import android.os.PersistableBundle
+import androidx.fragment.app.FragmentActivity
+import com.example.apktest.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : FragmentActivity(R.layout.activity_main) {
+    private lateinit var binding: ActivityMainBinding
 
-    private lateinit var model: ProductViewModel
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        model = ViewModelProvider.AndroidViewModelFactory(application)
-            .create(ProductViewModel::class.java)
-        model.allProducts.observe(this,
-            { products -> products.let { Toast.makeText(application, it.get(5).name, Toast.LENGTH_LONG).show() } })
-
-        getDataFromApi()
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
     }
 
-    private fun getDataFromApi() {
-        val productService = ServiceBuilder.buildService(ProductService::class.java)
-        val call = productService.getProducts()
-        call.enqueue(object : Callback<List<Product>> {
-            override fun onResponse(
-                call: Call<List<Product>>,
-                response: Response<List<Product>>,
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.let { model.insert(it) }
-                }
-            }
-
-            override fun onFailure(call: Call<List<Product>>, t: Throwable) {
-                Toast.makeText(applicationContext, t.localizedMessage, Toast.LENGTH_LONG).show()
-            }
-        })
+    override fun onStart() {
+        super.onStart()
+        supportFragmentManager.beginTransaction()
+            .add(R.id.fragment_container_view_tag, ListFragment())
+            .commit()
     }
 }

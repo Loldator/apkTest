@@ -14,6 +14,6 @@ class XmlParserTest : XmlParser {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         val rawXmlResource = appContext.resources.openRawResource(R.raw.entries)
         val entries = parse(rawXmlResource)
-        assertEquals(20284, entries.size)
+        assertEquals(20130, entries.size)
     }
 }

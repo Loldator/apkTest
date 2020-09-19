@@ -33,7 +33,10 @@ interface XmlParser {
             }
             // Starts by looking for the entry tag
             if (parser.name == "artikel") {
-                entries.add(readEntry(parser))
+                val element = readEntry(parser)
+                if (element.percent != "0.00%") {
+                    entries.add(element)
+                }
             } else {
                 skip(parser)
             }
@@ -53,6 +56,7 @@ interface XmlParser {
                 }
                 parseIfTagIsValid(parser)
             }
+            this.apk = calculateApk()
         }
         return entry
     }
