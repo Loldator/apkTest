@@ -20,6 +20,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     private val repository: ProductRepository
 
     val allProducts: LiveData<List<Product>>
+    lateinit var productDetail: LiveData<Product>
 
     init {
         val productsDao = ProductDatabase.getDatabase(application).productDao()
@@ -29,6 +30,10 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
 
     private fun insert(products: List<Product>) = viewModelScope.launch(Dispatchers.IO) {
         repository.insert(products)
+    }
+
+    fun getProduct(position: Int) {
+        allProducts.value?.get(position)?.number?.let { productDetail = repository.get(it) }
     }
 
     fun getDataFromApi() {

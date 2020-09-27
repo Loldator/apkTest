@@ -8,4 +8,8 @@ class ProductRepository(private val productDao: ProductDao) {
     fun insert(products: List<Product>) {
         productDao.insertProducts(products)
     }
+
+    fun get(number: String): LiveData<Product> {
+        return productDao.getProduct(number)
+    }
 }

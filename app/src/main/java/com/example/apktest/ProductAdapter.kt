@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.apktest.databinding.ItemViewBinding
 import com.example.apktest.db.Product
 
-class ProductAdapter : ListAdapter<Product, ProductAdapter.ProductViewholder>(DiffCallback()) {
+class ProductAdapter(val onClick: (Int) -> Unit) : ListAdapter<Product,
+        ProductAdapter.ProductViewholder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewholder {
         val binding = ItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -19,12 +20,18 @@ class ProductAdapter : ListAdapter<Product, ProductAdapter.ProductViewholder>(Di
         holder.bind(getItem(position))
     }
 
-    class ProductViewholder(private val binding: ItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ProductViewholder(private val binding: ItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            itemView.setOnClickListener { onClick(adapterPosition) }
+        }
+
         fun bind(item: Product) = with(itemView) {
-            binding.productName.text = item.name
-            if (item.name2.isNotEmpty()) binding.productName2.text = item.name2
-            binding.productPrice.text = context.getString(R.string.priceTemplate, item.price)
-            binding.productApk.text = context.getString(R.string.apkTemplate, item.apk)
+            binding.let {
+                it.productName.text = item.name
+                if (item.name2.isNotEmpty()) it.productName2.text = item.name2
+                it.productPrice.text = context.getString(R.string.priceTemplate, item.price)
+                it.productApk.text = context.getString(R.string.apkTemplate, item.apk)
+            }
         }
     }
 }

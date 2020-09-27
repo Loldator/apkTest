@@ -14,6 +14,9 @@ interface ProductDao {
     @Query("SELECT * FROM product_table ORDER BY apk DESC LIMIT 25")
     fun getAllProducts(): LiveData<List<Product>>
 
+    @Query("SELECT * FROM product_table WHERE number = :productNumber")
+    fun getProduct(productNumber: String): LiveData<Product>
+
     @Query("SELECT * FROM product_table WHERE number IN (:productIds)")
     fun getProductsByNumbers(productIds: IntArray): LiveData<List<Product>>
 

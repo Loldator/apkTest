@@ -16,8 +16,11 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     override fun onStart() {
         super.onStart()
-        supportFragmentManager.beginTransaction()
-            .add(R.id.fragment_container_view_tag, ListFragment())
-            .commit()
+        if (supportFragmentManager.backStackEntryCount == 0) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.fragment_container_view_tag, ListFragment())
+                .commit()
+        }
     }
 }

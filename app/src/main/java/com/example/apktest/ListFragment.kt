@@ -24,7 +24,7 @@ class ListFragment : Fragment(R.layout.recycler_view) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val adapter = ProductAdapter()
+        val adapter = ProductAdapter { position -> navigateToProductDetail(position) }
         setupRecyclerView(adapter)
         observeProducts(adapter)
     }
@@ -45,5 +45,14 @@ class ListFragment : Fragment(R.layout.recycler_view) {
         recyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapter
+    }
+
+    fun navigateToProductDetail(position: Int) {
+        viewModel.getProduct(position)
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container_view_tag, DetailFragment())
+            .addToBackStack("LIST_FRAGMENT_TAG")
+            .commit()
     }
 }
